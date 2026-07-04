@@ -1,7 +1,6 @@
 // MEMO — STATE & STORAGE
 const STORAGE_KEY = "memo-notes";
-const MAX_CHARS   = 1000;
-
+const MAX_CHARS = 1000;
 
 // LOAD & SAVE
 function loadNotes() {
@@ -17,47 +16,44 @@ function saveNotes(notes) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
 }
 
-
 // STATE
-let notes       = loadNotes();
+let notes = loadNotes();
 let activeColor = "yellow";
 let searchQuery = "";
 
-
 // DOM REFERENCES
-const notesGrid    = document.getElementById("notesGrid");
-const emptyState   = document.getElementById("emptyState");
-const noteCount    = document.getElementById("noteCount");
+const notesGrid = document.getElementById("notesGrid");
+const emptyState = document.getElementById("emptyState");
+const noteCount = document.getElementById("noteCount");
 const composeTitle = document.getElementById("composeTitle");
-const composeBody  = document.getElementById("composeBody");
-const charCount    = document.getElementById("charCount");
-const addBtn       = document.getElementById("addBtn");
-const colorPicker  = document.getElementById("colorPicker");
-const searchInput  = document.getElementById("searchInput");
-const resultCount  = document.getElementById("resultCount");
-const themeToggle  = document.getElementById("themeToggle");
-
+const composeBody = document.getElementById("composeBody");
+const charCount = document.getElementById("charCount");
+const addBtn = document.getElementById("addBtn");
+const colorPicker = document.getElementById("colorPicker");
+const searchInput = document.getElementById("searchInput");
+const resultCount = document.getElementById("resultCount");
+const themeToggle = document.getElementById("themeToggle");
 
 // COLOR CONFIG
 const COLOR_MAP = {
   yellow: { bg: "--note-yellow", border: "--note-yellow-border" },
-  blue:   { bg: "--note-blue",   border: "--note-blue-border"   },
-  pink:   { bg: "--note-pink",   border: "--note-pink-border"   },
-  green:  { bg: "--note-green",  border: "--note-green-border"  },
+  blue: { bg: "--note-blue", border: "--note-blue-border" },
+  pink: { bg: "--note-pink", border: "--note-pink-border" },
+  green: { bg: "--note-green", border: "--note-green-border" },
 };
-
 
 // RENDER ENGINE
 function getFilteredNotes() {
   if (searchQuery === "") return [...notes];
-  return notes.filter((note) =>
-    note.title.toLowerCase().includes(searchQuery) ||
-    note.body.toLowerCase().includes(searchQuery)
+  return notes.filter(
+    (note) =>
+      note.title.toLowerCase().includes(searchQuery) ||
+      note.body.toLowerCase().includes(searchQuery),
   );
 }
 
 function getSortedNotes(filtered) {
-  const pinned   = filtered.filter((n) => n.pinned);
+  const pinned = filtered.filter((n) => n.pinned);
   const unpinned = filtered.filter((n) => !n.pinned);
   return [...pinned, ...unpinned];
 }
@@ -73,12 +69,16 @@ function renderNotes() {
 
     filtered.forEach((note) => {
       const colors = COLOR_MAP[note.color] || COLOR_MAP.yellow;
-      const bgVal     = getComputedStyle(document.documentElement).getPropertyValue(colors.bg).trim();
-      const borderVal = getComputedStyle(document.documentElement).getPropertyValue(colors.border).trim();
+      const bgVal = getComputedStyle(document.documentElement)
+        .getPropertyValue(colors.bg)
+        .trim();
+      const borderVal = getComputedStyle(document.documentElement)
+        .getPropertyValue(colors.border)
+        .trim();
 
       const card = document.createElement("div");
       card.className = `note-card${note.pinned ? " is-pinned" : ""}`;
-      card.style.setProperty("--note-bg",     bgVal);
+      card.style.setProperty("--note-bg", bgVal);
       card.style.setProperty("--note-border", borderVal);
       card.dataset.id = note.id;
 
@@ -119,20 +119,19 @@ function renderNotes() {
   }
 }
 
-
 // CRUD OPERATIONS
 function addNote() {
   const title = composeTitle.value.trim();
-  const body  = composeBody.value.trim();
+  const body = composeBody.value.trim();
 
   if (!title && !body) return;
 
   const note = {
-    id:        crypto.randomUUID(),
-    title:     title,
-    body:      body,
-    color:     activeColor,
-    pinned:    false,
+    id: crypto.randomUUID(),
+    title: title,
+    body: body,
+    color: activeColor,
+    pinned: false,
     createdAt: Date.now(),
   };
 
@@ -156,11 +155,10 @@ function togglePin(id) {
   renderNotes();
 }
 
-
 // COMPOSE HELPERS
 function resetCompose() {
   composeTitle.value = "";
-  composeBody.value  = "";
+  composeBody.value = "";
   updateCharCount();
   composeTitle.focus();
 }
@@ -169,10 +167,9 @@ function updateCharCount() {
   const len = composeBody.value.length;
   charCount.textContent = `${len} / ${MAX_CHARS}`;
   charCount.classList.toggle("is-near-limit", len >= 800 && len < MAX_CHARS);
-  charCount.classList.toggle("is-at-limit",   len >= MAX_CHARS);
+  charCount.classList.toggle("is-at-limit", len >= MAX_CHARS);
   addBtn.disabled = len >= MAX_CHARS;
 }
-
 
 // UTILITIES
 function escapeHTML(str) {
@@ -187,26 +184,24 @@ function escapeHTML(str) {
 function formatTimestamp(ts) {
   return new Date(ts).toLocaleDateString("en-US", {
     month: "short",
-    day:   "numeric",
-    year:  "numeric",
-    hour:  "2-digit",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
     minute: "2-digit",
   });
 }
-
 
 // EVENT DELEGATION — NOTES GRID
 function handleGridClick(event) {
   const btn = event.target.closest(".note-action-btn");
   if (!btn) return;
 
-  const id     = btn.dataset.id;
+  const id = btn.dataset.id;
   const action = btn.dataset.action;
 
   if (action === "delete") deleteNote(id);
-  if (action === "pin")    togglePin(id);
+  if (action === "pin") togglePin(id);
 }
-
 
 // EVENT DELEGATION — COLOR PICKER
 function handleColorPick(event) {
@@ -219,7 +214,6 @@ function handleColorPick(event) {
     d.classList.toggle("is-active", d.dataset.color === activeColor);
   });
 }
-
 
 // EVENT LISTENERS
 addBtn.addEventListener("click", addNote);
@@ -249,9 +243,9 @@ searchInput.addEventListener("input", () => {
 });
 
 themeToggle.addEventListener("click", () => {
-  const root    = document.documentElement;
+  const root = document.documentElement;
   const current = root.getAttribute("data-theme");
-  const next    = current === "light" ? "dark" : "light";
+  const next = current === "light" ? "dark" : "light";
   root.setAttribute("data-theme", next);
   themeToggle.textContent = next === "dark" ? "☀" : "☾";
   renderNotes();
@@ -263,7 +257,6 @@ document.addEventListener("keydown", (e) => {
     searchInput.focus();
   }
 });
-
 
 // INITIALISE
 updateCharCount();
